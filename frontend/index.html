@@ -1,23 +1,148 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gerenciador de Tarefas</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
+  <title>Gestão de Tarefas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="bg-light">
+<body>
+  <div class="container mt-5">
+    <h1 class="mb-4">Gestão de Tarefas</h1>
 
-  <div class="container py-5">
-    <h1 class="mb-4 text-center">Gerenciador de Tarefas do Raul😉</h1>
+    <!-- Login Form -->
+    <div id="login-card" class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Login</h5>
+        <form id="loginForm">
+          <input class="form-control mb-2" placeholder="Email" type="email" name="email" required/>
+          <input class="form-control mb-2" placeholder="Senha" type="password" name="password" required/>
+          <button class="btn btn-primary" type="submit">Entrar</button>
+        </form>
+        <div class="mt-2">Ou <a href="#" id="showRegister">registre-se</a></div>
+        <div id="login-msg" class="text-danger mt-2"></div>
+      </div>
+    </div>
 
-    <form id="taskForm" class="d-flex mb-4">
-      <input type="text" id="taskInput" class="form-control me-2" placeholder="Nova tarefa..." required />
-      <button type="submit" class="btn btn-primary">Adicionar</button>
-    </form>
+    <!-- Register Form -->
+    <div id="register-card" class="card mb-3" style="display:none;">
+      <div class="card-body">
+        <h5 class="card-title">Cadastro</h5>
+        <form id="registerForm">
+          <input class="form-control mb-2" placeholder="Nome" type="text" name="name" required/>
+          <input class="form-control mb-2" placeholder="Email" type="email" name="email" required/>
+          <input class="form-control mb-2" placeholder="Senha" type="password" name="password" required/>
+          <button class="btn btn-primary" type="submit">Registrar</button>
+        </form>
+        <div class="mt-2">Já tem conta? <a href="#" id="showLogin">Entrar</a></div>
+        <div id="register-msg" class="text-danger mt-2"></div>
+      </div>
+    </div>
 
-    <ul id="taskList" class="list-group"></ul>
+    <!-- Task List -->
+    <div id="tasks-section" style="display:none;">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2>Minhas Tarefas</h2>
+        <button id="logout" class="btn btn-danger btn-sm">Sair</button>
+      </div>
+      <form id="taskForm" class="mb-3">
+        <input class="form-control mb-2" placeholder="Título" name="title" required />
+        <input class="form-control mb-2" placeholder="Descrição" name="description" />
+        <button class="btn btn-success" type="submit">Criar Tarefa</button>
+      </form>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Título</th><th>Descrição</th><th>Status</th><th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="taskList"></tbody>
+      </table>
+    </div>
   </div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script>
+const API = '/api';
+
+let authToken = localStorage.getItem('token');
+
+function showLogin() { $('#register-card').hide(); $('#login-card').show(); }
+function showRegister() { $('#login-card').hide(); $('#register-card').show(); }
+function showTasks() { $('#login-card, #register-card').hide(); $('#tasks-section').show(); }
+
+$('#showRegister').on('click', showRegister);
+$('#showLogin').on('click', showLogin);
+
+$('#registerForm').on('submit', async function(e){
+  e.preventDefault();
+  let data = Object.fromEntries(new FormData(this));
+  let res = await fetch(API + '/users/register', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  if (res.ok) {
+    $('#register-msg').text('Cadastro realizado! Faça login.');
+  } else {
+    let ret = await res.json();
+    $('#register-msg').text(ret.error || ret.message);
+  }
+});
+
+$('#loginForm').on('submit', async function(e){
+  e.preventDefault();
+  let data = Object.fromEntries(new FormData(this));
+  let res = await fetch(API + '/users/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  if (res.ok) {
+    let ret = await res.json();
+    localStorage.setItem('token', ret.token);
+    authToken = ret.token;
+    showTasks();
+    loadTasks();
+  } else {
+    let ret = await res.json();
+    $('#login-msg').text(ret.error || ret.message);
+  }
+});
+
+$('#taskForm').on('submit', async function(e){
+  e.preventDefault();
+  let data = Object.fromEntries(new FormData(this));
+  let res = await fetch(API + '/tasks', {
+    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer ' + authToken },body:JSON.stringify(data)
+  });
+  if (res.ok) {
+    this.reset();
+    loadTasks();
+  }
+});
+
+async function loadTasks() {
+  let res = await fetch(API + '/tasks', {headers:{'Authorization':'Bearer ' + authToken}});
+  if (!res.ok) return;
+  let tasks = await res.json();
+  let html = tasks.map(task => `
+    <tr>
+      <td>${task.title}</td>
+      <td>${task.description||''}</td>
+      <td>${task.done ? 'Concluída' : 'Pendente'}</td>
+      <td>
+        <button onclick="toggleDone('${task._id}',${!task.done})" class="btn btn-${task.done?'secondary':'success'} btn-sm">${task.done?'Refazer':'Concluir'}</button>
+        <button onclick="deleteTask('${task._id}')" class="btn btn-danger btn-sm">Deletar</button>
+      </td>
+    </tr>
+  `).join('');
+  $('#taskList').html(html);
+}
+window.toggleDone = async function(id, val){
+  await fetch(API+'/tasks/'+id, {method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+authToken},body:JSON.stringify({done:val})});
+  loadTasks();
+}
+window.deleteTask = async function(id){
+  await fetch(API+'/tasks/'+id, {method:'DELETE',headers:{'Authorization':'Bearer '+authToken}});
+  loadTasks();
+}
+$('#logout').on('click',function(){
+  localStorage.removeItem('token'); authToken=''; showLogin();
+});
+if (authToken) { showTasks(); loadTasks(); }
+
+</script>
 </body>
 </html>

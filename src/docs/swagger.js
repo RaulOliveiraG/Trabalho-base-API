@@ -1,26 +1,47 @@
-const swaggerJsDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 
 const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'API candido',
+      title: 'Gestão de Tarefas API',
       version: '1.0.0',
-      description: 'Documentação da API candido',
+      description: 'Documentação da API de Gestão de Tarefas (array em memória)'
     },
     servers: [
-      {
-        url: '<http://localhost:3000>',
-        description: 'Servidor local',
-      },
+      { url: 'http://localhost:3000', description: 'Local' }
     ],
+    components: {
+      schemas: {
+        UserRegister: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            email: { type: 'string' },
+            password: { type: 'string' }
+          }
+        },
+        UserLogin: {
+          type: 'object',
+          properties: {
+            email: { type: 'string' },
+            password: { type: 'string' }
+          }
+        },
+        Task: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            title: { type: 'string' },
+            description: { type: 'string' },
+            done: { type: 'boolean' },
+            createdAt: { type: 'string' }
+          }
+        }
+      }
+    }
   },
-  apis: ['./src/routes/*.js'], // Caminho para os arquivos de rotas
+  apis: ['./src/routes/*.js']
 };
 
-const specs = swaggerJsDoc(options);
-
-module.exports = (app) => {
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
-};
+module.exports = swaggerJsdoc(options);

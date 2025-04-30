@@ -1,23 +1,18 @@
+require('dotenv').config();
 const express = require('express');
-const dotenv = require('dotenv');
-const routes = require('./routes');
-const swaggerConfig = require('./docs/swagger');
-
-dotenv.config();
-
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Middleware para parsear JSON
+const routes = require('./routes');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./docs/swagger');
+
 app.use(express.json());
+app.use(express.static('public'));
 
-// Rotas
 app.use('/api', routes);
 
 // Swagger
-swaggerConfig(app);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Iniciar servidor
-app.listen(PORT, () => {
-  console.log('Servidor rodando na porta ${PORT}');
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log("Servidor rodando na porta " + PORT));

@@ -6,13 +6,14 @@ const router = express.Router();
 /**
  * @swagger
  * tags:
- *   name: Tasks
+ *   name: Tarefas
  *   description: Gerenciamento de tarefas
  */
-router.post('/', auth, taskController.createTask);//cria
-router.get('/', auth, taskController.getTasks);//lista
-router.get('/:id', auth, taskController.getTask);//coleta
-router.put('/:id', auth, taskController.updateTask);//atualiza
-router.delete('/:id', auth, taskController.deleteTask);//exclui
 
-module.exports = router;//exporta o objeto
+router.post('/', auth, taskController.createTask);
+router.get('/', auth, taskController.getTasks);
+router.get('/:id', auth, taskController.getTask);
+router.put('/:id', auth, taskController.updateTask);
+router.delete('/:id', auth, taskController.deleteTask);
+
+module.exports = router;
