@@ -1,27 +1,29 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const userModel = require('../models/user');
-const { users } = userModel;
-
-exports.users = users; // para compatibilidade com o middleware
+const User = require('../models/user');
 
 exports.register = async (req, res) => {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) return res.status(400).json({ error: 'Preencha todos os campos.' });
-  if (users.find(u => u.email === email)) return res.status(400).json({ error: 'Email já existe.' });
-
-  const hash = await bcrypt.hash(password, 10);
-  const user = { id: userModel.userIdSeq++, name, email, password: hash };
-  users.push(user);
-  res.status(201).json({ message: 'Usuário registrado.' });
+  try {
+    const { name, email, password } = req.body;
+    const exist = await User.findOne({ email });
+    if (exist) return res.status(400).json({ error: 'Email já cadastrado.' });
+    await User.create({ name, email, password });
+    res.status(201).json({ message: 'Usuário registrado.' });
+  } catch(e) {
+    res.status(500).json({ error: 'Erro ao registrar usuário.' });
+  }
 };
 
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
-  const user = users.find(u => u.email === email);
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(401).json({ error: 'Credenciais inválidas.' });
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user || !(await user.comparePassword(password))) {
+      return res.status(401).json({ error: 'Credenciais inválidas.' });
+    }
+    // Em vez de token, retorna dados do usuário
+    res.json({ 
+      user: { id: user._id, email: user.email, name: user.name }
+    });
+  } catch(e) {
+    res.status(500).json({ error: 'Erro ao fazer login.' });
   }
-  const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET || 'secreto', { expiresIn: '1d' });
-  res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
 };

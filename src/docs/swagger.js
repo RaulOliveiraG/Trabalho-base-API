@@ -6,10 +6,10 @@ const options = {
     info: {
       title: 'Gestão de Tarefas API',
       version: '1.0.0',
-      description: 'Documentação da API de Gestão de Tarefas (array em memória)'
+      description: 'Documentação da API de Gestão de Tarefas.'
     },
     servers: [
-      { url: 'http://localhost:3000', description: 'Local' }
+      { url: 'http://localhost:3000/api', description: 'Local server' }
     ],
     components: {
       schemas: {
@@ -19,23 +19,21 @@ const options = {
             name: { type: 'string' },
             email: { type: 'string' },
             password: { type: 'string' }
-          }
+          },
         },
         UserLogin: {
           type: 'object',
           properties: {
             email: { type: 'string' },
             password: { type: 'string' }
-          }
+          },
         },
         Task: {
           type: 'object',
           properties: {
-            id: { type: 'integer' },
             title: { type: 'string' },
             description: { type: 'string' },
-            done: { type: 'boolean' },
-            createdAt: { type: 'string' }
+            done: { type: 'boolean' }
           }
         }
       }

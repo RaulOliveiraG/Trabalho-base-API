@@ -1,47 +1,44 @@
-const taskModel = require('../models/task');
-const { tasks } = taskModel;
+const Task = require('../models/task');
 
-exports.tasks = tasks; // compat para possíveis usos externos
-
-exports.createTask = (req, res) => {
-  const { title, description } = req.body;
-  if (!title) return res.status(400).json({ error: 'Título é obrigatório.' });
-  const task = {
-    id: taskModel.taskIdSeq++,
-    title,
-    description: description || '',
-    done: false,
-    createdAt: new Date().toISOString(),
-    owner: req.user.id
-  };
-  tasks.push(task);
-  res.status(201).json(task);
+// Criar
+exports.createTask = async (req, res) => {
+  try {
+    const { title, description } = req.body;
+    const owner = req.user.id;
+    const task = await Task.create({ title, description, owner });
+    res.status(201).json(task);
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao criar tarefa.' });
+  }
 };
 
-exports.getTasks = (req, res) => {
-  const userTasks = tasks.filter(t => t.owner === req.user.id);
-  res.json(userTasks);
+// Listar
+exports.getTasks = async (req, res) => {
+  const tasks = await Task.find({ owner: req.user.id });
+  res.json(tasks);
 };
 
-exports.getTask = (req, res) => {
-  const task = tasks.find(t => t.id === parseInt(req.params.id) && t.owner === req.user.id);
+// Detalhes
+exports.getTask = async (req, res) => {
+  const task = await Task.findOne({ _id: req.params.id, owner: req.user.id });
   if (!task) return res.status(404).json({ error: 'Tarefa não encontrada.' });
   res.json(task);
 };
 
-exports.updateTask = (req, res) => {
-  const task = tasks.find(t => t.id === parseInt(req.params.id) && t.owner === req.user.id);
+// Atualizar
+exports.updateTask = async (req, res) => {
+  const task = await Task.findOneAndUpdate(
+    { _id: req.params.id, owner: req.user.id },
+    req.body,
+    { new: true }
+  );
   if (!task) return res.status(404).json({ error: 'Tarefa não encontrada.' });
-  const { title, description, done } = req.body;
-  if (typeof title !== 'undefined') task.title = title;
-  if (typeof description !== 'undefined') task.description = description;
-  if (typeof done !== 'undefined') task.done = !!done;
   res.json(task);
 };
 
-exports.deleteTask = (req, res) => {
-  const idx = tasks.findIndex(t => t.id === parseInt(req.params.id) && t.owner === req.user.id);
-  if (idx === -1) return res.status(404).json({ error: 'Tarefa não encontrada.' });
-  tasks.splice(idx, 1);
-  res.json({ message: 'Tarefa excluída.' });
+// Apagar
+exports.deleteTask = async (req, res) => {
+  const task = await Task.findOneAndDelete({ _id: req.params.id, owner: req.user.id });
+  if (!task) return res.status(404).json({ error: 'Tarefa não encontrada.' });
+  res.json({ message: 'Tarefa deletada.' });
 };

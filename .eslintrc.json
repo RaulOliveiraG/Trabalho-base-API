@@ -1,16 +1,19 @@
 {
+  //ambientes que serão usados
   "env": {
-    "browser": true,
-    "es2021": true
+    "browser": true,//pode usar objetos e variáveis do navegador
+    "es2021": true//recursos do ECMAScript de 2021
+    //uma especificação que define as regras, sintaxe e recursos do JavaScript, tornando-o uma linguagem padrão internacional.
   },
+   //regras recomendadas do ESLint um conjunto básico de boas práticas
   "extends": "eslint:recommended",
-  "parserOptions": {
-    "ecmaVersion": 12,
-    "sourceType": "module"
+  "parserOptions": {//configura o "analisador" para entender
+    "ecmaVersion": 12,//sintaxe do ecma versão 12
+    "sourceType": "module"//codigo usa modulos (import e export)
   },
   "rules": {
-    "indent": ["error", 2],
-    "quotes": ["error", "single"],
-    "semi": ["error", "always"]
+    "indent": ["error", 2],//indentação de 2 espaços se não da erro
+    "quotes": ["error", "single"],//exige aspas simples
+    "semi": ["error", "always"] // Exige ponto e vírgula no final das instruções
   }
 }

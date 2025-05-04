@@ -7,7 +7,7 @@ const router = express.Router();
  * /users/register:
  *   post:
  *     summary: Registro de novo usuário
- *     tags: [Usuários]
+ *     tags: [Users]
  *     requestBody:
  *       required: true
  *       content:
@@ -16,16 +16,18 @@ const router = express.Router();
  *             $ref: '#/components/schemas/UserRegister'
  *     responses:
  *       201:
- *         description: Usuário registrado
+ *         description: Usuário registrado com sucesso
+ *       400:
+ *         description: Email já cadastrado
  */
-router.post('/register', userController.register);
+router.post('/register', userController.register);//puxa o controller register, nessa rota
 
 /**
  * @swagger
  * /users/login:
  *   post:
  *     summary: Login de usuário
- *     tags: [Usuários]
+ *     tags: [Users]
  *     requestBody:
  *       required: true
  *       content:
@@ -34,10 +36,10 @@ router.post('/register', userController.register);
  *             $ref: '#/components/schemas/UserLogin'
  *     responses:
  *       200:
- *         description: Login efetuado
+ *         description: Login efetuado com sucesso
  *       401:
  *         description: Credenciais inválidas
  */
-router.post('/login', userController.login);
+router.post('/login', userController.login);//puxa o controller login, nessa rota
 
 module.exports = router;

@@ -1,6 +1,10 @@
-// Array em memória para tarefas
-const tasks = [];
-let taskIdSeq = 1;
+const mongoose = require('mongoose');
 
-// Exportando ambos para uso no controller
-module.exports = { tasks, taskIdSeq };
+const taskSchema = new mongoose.Schema({
+  title:       { type: String, required: true },
+  description: { type: String },
+  done:        { type: Boolean, default: false },
+  owner:       { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
+}, { timestamps: true });
+
+module.exports = mongoose.model('Task', taskSchema);

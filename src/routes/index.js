@@ -1,17 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const userRoutes = require('./userRoutes');
+const taskRoutes = require('./taskRoutes');
 
-/**
- * @swagger
- * /:
- *   get:
- *     summary: Retorna uma mensagem de boas-vindas
- *     responses:
- *       200:
- *         description: Mensagem de boas-vindas
- */
-router.get('/', (req, res) => {
-  res.json({ mensagem: 'API candido' });
-});
+router.use('/users', userRoutes);//rotas dos usuarios
+router.use('/tasks', taskRoutes);//rotas das tarefas
 
 module.exports = router;
