@@ -9,6 +9,7 @@
     "lint": "eslint src"
   },
   "dependencies": {
+<<<<<<< HEAD
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
@@ -16,6 +17,10 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.16.0",
     "mongoose": "^8.14.1",
+=======
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+>>>>>>> 16e1f70db9e58cd09251ad67d4eb9d28df66bf04
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   },

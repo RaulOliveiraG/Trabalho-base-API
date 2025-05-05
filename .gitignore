@@ -1,6 +1,17 @@
+<<<<<<< HEAD
 # Dependências
 node_modules/
 
 # Variáveis de ambiente
 #oculta os dados reais mas deixa para quem consulta o git hub ver quais dados são usados
 .env 
+=======
+ # Dependências
+node_modules/
+
+# Variáveis de ambiente
+.env
+
+# Logs
+*.log
+>>>>>>> 16e1f70db9e58cd09251ad67d4eb9d28df66bf04

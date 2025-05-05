@@ -1,9 +1,15 @@
+<<<<<<< HEAD
 const swaggerJsdoc = require('swagger-jsdoc');
+=======
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+>>>>>>> 16e1f70db9e58cd09251ad67d4eb9d28df66bf04
 
 const options = {
   definition: {
     openapi: '3.0.0',
     info: {
+<<<<<<< HEAD
       title: 'Gestão de Tarefas API',
       version: '1.0.0',
       description: 'Documentação da API de Gestão de Tarefas.'
@@ -43,3 +49,24 @@ const options = {
 };
 
 module.exports = swaggerJsdoc(options);
+=======
+      title: 'API candido',
+      version: '1.0.0',
+      description: 'Documentação da API candido',
+    },
+    servers: [
+      {
+        url: '<http://localhost:3000>',
+        description: 'Servidor local',
+      },
+    ],
+  },
+  apis: ['./src/routes/*.js'], // Caminho para os arquivos de rotas
+};
+
+const specs = swaggerJsDoc(options);
+
+module.exports = (app) => {
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+};
+>>>>>>> 16e1f70db9e58cd09251ad67d4eb9d28df66bf04
