@@ -12,7 +12,7 @@ const options = {
       { url: 'http://localhost:3000/api', description: 'Local server' }
     ],
     components: {
-      schemas: {
+      schemas: {//esquemas ja montados...
         UserRegister: {
           type: 'object',
           properties: {
